@@ -176,7 +176,54 @@ pre code {
 </div>
 
 
+<pre class="r"><code>library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+library(glmnet)
+# installing and loading janitor package
+library(janitor)
+library(pROC)
+library(corrplot)
+tidymodels_prefer()</code></pre>
+<p>Exercise 1</p>
+<pre class="r"><code># reading in the data
+pokemon &lt;- read_csv(&quot;/Users/zackreardon/Downloads/homework-6/data/Pokemon.csv&quot;)</code></pre>
+<pre><code>## Rows: 800 Columns: 13
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (3): Name, Type 1, Type 2
+## dbl (9): #, Total, HP, Attack, Defense, Sp. Atk, Sp. Def, Speed, Generation
+## lgl (1): Legendary
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code># cleaning names
+pokemon &lt;- clean_names(pokemon)
 
+# filtering out rarer types
+pokemon &lt;- filter(pokemon, type_1 %in% c(&quot;Bug&quot;, &quot;Fire&quot;, &quot;Grass&quot;, &quot;Normal&quot;, &quot;Water&quot;, &quot;Psychic&quot;))
+
+# converting type_1 and legendary to factors
+pokemon$type_1 &lt;- as.factor(pokemon$type_1)
+pokemon$legendary &lt;- as.factor(pokemon$legendary)
+
+# do initial split of data
+pokemon_split &lt;- initial_split(pokemon, prop=0.8, strata=type_1)
+
+pokemon_train &lt;- training(pokemon_split)
+pokemon_test &lt;- testing(pokemon_split)
+
+# fold training set with v=5 and stratify on outcome
+pokemon_folds &lt;- vfold_cv(pokemon_train, v=5, strata=type_1)
+
+# create recipe
+pokemon_recipe &lt;- recipe(type_1 ~ legendary + generation + sp_atk + attack + speed + defense + hp + sp_def, data=pokemon_train) %&gt;%
+  # dummy coding categorical predictors
+  step_dummy(legendary, generation) %&gt;%
+  # centering and scaling all predictors
+  step_center(all_predictors()) %&gt;%
+  step_scale(all_predictors())</code></pre>
+<p>Exercise 2</p>
 
 
 
