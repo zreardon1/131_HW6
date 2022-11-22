@@ -57,6 +57,14 @@ pokemon_recipe <- recipe(type_1 ~ legendary + generation + sp_atk + attack + spe
 
 Exercise 2
 
+```{r}
+# creating correlation plot of numeric predictors
+pokemon_train %>%
+  select(where(is.numeric), -number) %>%
+  cor() %>%
+  corrplot()
+```
+
 Exercise 3
 
 Exercise 4
