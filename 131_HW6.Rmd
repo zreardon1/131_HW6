@@ -38,12 +38,14 @@ pokemon$type_1 <- as.factor(pokemon$type_1)
 pokemon$legendary <- as.factor(pokemon$legendary)
 
 # do initial split of data
+set.seed(100)
 pokemon_split <- initial_split(pokemon, prop=0.8, strata=type_1)
 
 pokemon_train <- training(pokemon_split)
 pokemon_test <- testing(pokemon_split)
 
 # fold training set with v=5 and stratify on outcome
+set.seed(100)
 pokemon_folds <- vfold_cv(pokemon_train, v=5, strata=type_1)
 
 # create recipe
@@ -63,9 +65,17 @@ pokemon_train %>%
   select(where(is.numeric), -number) %>%
   cor() %>%
   corrplot()
+
+# visualizing correlation between categorical variables
+pokemon_train2 <- count(pokemon_train, type_1, legendary)
+ggplot(pokemon_train2, aes(x = type_1, y = legendary, size = n)) + geom_point()
 ```
+There appears to be fairly strong positive correlations between total and the other numeric variable besides generation. This makes sense since total is effectively a summation of these variables for any given pokemon. On the numeric variable front, sp_def and defense have a relatively high correlation with one another. This is probably due to defense and defense speed being intrinsically linked. Comparing the categorical variables type_1 and legendary we can see that the relationship between the two is fairly inconsistent. This might be the case since legendary pokemon may be rare and class dependent.
 
 Exercise 3
+
+```{r}
+```
 
 Exercise 4
 
